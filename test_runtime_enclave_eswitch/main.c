@@ -34,9 +34,12 @@ int handle_enclave_exit(uint64_t rdi, uint64_t rsi, uint64_t rdx,
         uint64_t * aex_tsc_addr = (uint64_t *)(0x8000000000 + 0x100000 + (counter - 1) * 0x1000);
         uint64_t * eexit_tsc_addr = (uint64_t *)((uintptr_t)aex_tsc_addr + 8);
         uint64_t * eswitch_tsc_addr = (uint64_t *)((uintptr_t)eexit_tsc_addr + 16);
-        uint64_t * syscall_tsc_addr = (uint64_t *)((uintptr_t)eswitch_tsc_addr + 8);
+        uint64_t * syscall2_tsc_addr = (uint64_t *)((uintptr_t)eswitch_tsc_addr + 8);
+        uint64_t * sysret_tsc_addr = (uint64_t *)((uintptr_t)syscall2_tsc_addr + 8);
+        uint64_t * syscall1_tsc_addr = (uint64_t *)((uintptr_t)sysret_tsc_addr + 8);
         
-        printf("stage0: %lu, stage1:%lu, stage2:%lu\n", *eswitch_tsc_addr, *syscall_tsc_addr, *aex_tsc_addr);
+        printf("stage0: %lu, stage1: %lu, stage2: %lu, stage3: %lu, stage4: %lu\n", 
+                    *eswitch_tsc_addr, *syscall1_tsc_addr, *sysret_tsc_addr, *syscall2_tsc_addr, *aex_tsc_addr);
 #endif  
         return 0;
         case EEXIT_EXIT:

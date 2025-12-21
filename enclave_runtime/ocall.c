@@ -68,9 +68,13 @@ int do_ocall(uint64_t rdi, uint64_t rsi)
 #ifdef EXCEPTION_LOG
     uint64_t *rdtsc_addr4 = (uint64_t *)((uintptr_t)rdtsc_addr3 + 0x8);
     uint64_t *rdtsc_addr5 = (uint64_t *)((uintptr_t)rdtsc_addr4 + 0x8);
+    uint64_t *rdtsc_addr6 = (uint64_t *)((uintptr_t)rdtsc_addr5 + 0x8);
+    uint64_t *rdtsc_addr7 = (uint64_t *)((uintptr_t)rdtsc_addr6 + 0x8);
     if (rdi == EEXIT_OCALL_SYSCALL) {
         *rdtsc_addr4 = eswitch_tsc;
         *rdtsc_addr5 = *(uint64_t *)0x5000;
+        *rdtsc_addr6 = *(uint64_t *)0x6000;
+        *rdtsc_addr7 = *(uint64_t *)0x7000;
     }
 #endif
     asm volatile("" ::: "memory");

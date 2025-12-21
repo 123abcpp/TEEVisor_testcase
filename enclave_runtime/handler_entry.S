@@ -58,6 +58,28 @@ runtime_internal_exception:
     call do_eexit
 
 runtime_syscall_handler_entry:
+#ifdef EXCEPTION_LOG
+    /* if (rax != 0) goto normal_path */
+    testq   %rax, %rax
+    jne     1f
+
+    /* rax == 0: read TSC */
+    rdtsc                   /* edx:eax = TSC */
+
+    /* combine to 64-bit value in rax */
+    shlq    $32, %rdx
+    orq     %rdx, %rax
+
+    /* store TSC to 0x6000 */
+    movq    %rax, 0x6000
+
+    /* return to userspace */
+    sysretq
+
+1:
+#endif
+
+
     movq $EEXIT_OCALL_SYSCALL, %rdi
     call do_ocall
 
