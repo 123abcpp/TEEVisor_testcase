@@ -20,7 +20,6 @@ int handle_enclave_exit(uint64_t rdi, uint64_t rsi, uint64_t rdx,
 #ifdef ENCLU_LOG
     uint64_t tsc = rdtsc();
 #endif
-    int ret;
     __UNUSED(rdx);
     __UNUSED(r8);
     __UNUSED(r9);
@@ -38,60 +37,6 @@ int handle_enclave_exit(uint64_t rdi, uint64_t rsi, uint64_t rdx,
 #endif    
         switch (rdi)
         {
-        case EEXIT_OCALL_DO_TEST_SUITE:
-            printf("Enclave OCALL Test Suite Start!\n");
-            uint64_t buf_write = 0x1234567890abcdef;
-            // do a debug write&read here
-            int fd = open("/proc/self/mem", O_RDWR);
-            if (fd < 0)
-            {
-                perror("Open /proc/self/mem failed!\n");
-                return 0;
-            }
-            ret = pwrite(fd, (void *)&buf_write, 8, 0x500000);
-            if (ret != 8)
-            {
-                perror("Debug write failed!\n");
-                return 0;
-            }
-            u_int64_t buf_read = 0;
-            ret = pread(fd, (void *)&buf_read, 8, 0x500000);
-            if (ret != 8)
-            {
-                perror("Debug read failed!\n");
-                return 0;
-            }
-            printf("Debug read value: 0x%016lx\n", buf_read);
-
-            struct sgx_enclave_modify_types metadata1 = {
-                .offset = (uint64_t)0x600000,
-                .length = 0x1000,
-                .page_type = SGX_PAGE_TYPE_TRIM,
-            };
-            ret = enclave_modify_type(&metadata1);
-            if (ret)
-            {
-                perror("EMODT Failed!\n");
-                return 0;
-            }
-
-            struct sgx_enclave_restrict_permissions metadata2 = {
-                .offset = (uint64_t)0x601000,
-                .length = 0x1000,
-                .permissions = SGX_SECINFO_FLAGS_R,
-            };
-            ret = enclave_restrict_permissions(&metadata2);
-            if (ret)
-            {
-                perror("EMOPR Failed!\n");
-                return 0;
-            }
-            run->function = EENTER;
-#ifdef ENCLU_LOG
-            printf("stage: -1, index: 0 tsc: %lu\n",rdtsc());
-#endif
-            return EENTER;
-            break;
         case EEXIT_EXIT:
             printf("Exit from enclave\n");
             break;
@@ -112,7 +57,6 @@ int handle_enclave_exit(uint64_t rdi, uint64_t rsi, uint64_t rdx,
             printf("stage: -1, index: 0 tsc: %lu\n",rdtsc());
             return EENTER;
         case EEXIT_OCALL_TEST:
-            printf("stage: 4, index: 0 tsc: %lu\n", rsi);
             run->rdi = 0;
             run->function = EENTER;
             printf("stage: -1, index: 0 tsc: %lu\n",rdtsc());
