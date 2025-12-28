@@ -258,7 +258,7 @@ void handle_ecall(unsigned long rdi, unsigned long rsi, unsigned long _aep /*rcx
     // call runtime test
     ret = runtime_test_case();
     if (ret) {
-        do_eexit(EEXIT_FAIL, 2);
+        do_eexit(EEXIT_FAIL, ret);
     }
     // handle ecall here
 

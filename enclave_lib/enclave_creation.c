@@ -900,7 +900,7 @@ struct enclave *build_enclave(struct enclave_build_param *param)
     ioctl(teevisor_fd, SGX_IOC_ENCLAVE_REGISTER_LOG_BUFFER, 0);
 #endif
 
-    uint64_t enclave_final_size = param->edmm_extra_mem ? (runtime ? param->enclave_size + param->runtime_size : param->enclave_size * 2) : param->enclave_size;
+    enclave_final_size = param->edmm_extra_mem ? (runtime ? param->enclave_size + param->runtime_size : param->enclave_size * 2) : param->enclave_size;
     uint64_t enclave_addr = (uint64_t)mmap((void *)param->enclave_base, enclave_final_size,
                                            PROT_READ | PROT_WRITE | PROT_EXEC, MAP_FIXED_NOREPLACE | MAP_SHARED,
                                            teevisor_fd, 0);
