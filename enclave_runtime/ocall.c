@@ -5,7 +5,7 @@ extern int __do_ocall(uint64_t rdi, uint64_t rsi);
 extern int __do_eclone(uint64_t clone_ptr, uint64_t exit_addr, uint64_t metadata_vaddr);
 
 uint64_t shared_counter = 0;
-
+uint64_t timer_count = 0;
 #ifdef EXCEPTION_LOG
 uint64_t eswitch_tsc = 0;
 #endif
@@ -77,6 +77,11 @@ int do_ocall(uint64_t rdi, uint64_t rsi)
         *rdtsc_addr7 = *(uint64_t *)0x7000;
     }
 #endif
+    // Fill rsi with timer count if is the timer test exit syscall
+    if (rsi == 111) {
+        rsi = timer_count;
+    };
+
     asm volatile("" ::: "memory");
     __do_ocall(rdi, rsi);
     uint64_t tsc3 = rdtsc();
@@ -265,4 +270,28 @@ int do_eraise(uint32_t exitinfo, uint64_t maddr, uint32_t errcd_value)
         .error_code_val = errcd_value,
     };
     return -enclu(ERAISE, (uint64_t)&eraise_info, 0, 0);
+}
+
+int do_esettimer(uint64_t count, uint64_t periodic)
+{
+    return -enclu(ESETTIMER, count | (periodic << 63), 0, 0);
+}
+
+void handle_timer(uint64_t cssa)
+{
+    sgx_pal_gpr_t *gpr;
+    if (cssa > 0) {
+        gpr = GET_ENCLAVE_TLS(gpr);
+    } else {
+        gpr = GET_ENCLAVE_TLS(ugpr);
+    }
+
+    gpr->switch_flag.sse_ignore = 1;
+    timer_count += 1;
+    sgx_switch_flag_t flag = {
+        .user = cssa > 0 ? 0 : 1,
+        .sse_ignore = 1,
+        .target_ssa = 0,
+    };
+     do_eswitch(flag);
 }

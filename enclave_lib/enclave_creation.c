@@ -1063,6 +1063,10 @@ struct enclave *build_enclave(struct enclave_build_param *param)
         if (runtime)
         {
             tcs->oussa = encl->ussa_base - encl->user_base + param->ssa_frame_size * count * PAGE_SIZE;
+
+            if (param->timer) {
+                tcs->flags |= TCS_FLAGS_TIMER;
+            }
         }
     }
 

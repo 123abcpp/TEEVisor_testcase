@@ -179,6 +179,7 @@ void print_log() {
 #ifdef ENCLU_LOG
     printf("stage: -1, index: 0 tsc: %lu\n",enclu_start);
 #endif
+    __sync_synchronize();
     for (int i = 0; i < PAGE_SIZE/16; i++) {
 
         if (page->slots[i].tsc == 0) {

@@ -178,6 +178,8 @@ typedef struct {
 static_assert(sizeof(sgx_arch_tcs_t) == 4096, "incorrect struct size");
 
 #define TCS_FLAGS_DBGOPTIN (01ULL)
+#define TCS_FLAGS_AEXNOTIFY (02ULL)
+#define TCS_FLAGS_TIMER (04ULL)
 
 typedef struct {
     uint8_t user : 1;
@@ -459,6 +461,7 @@ static inline int enclu(uint32_t eax, uint64_t rbx, uint64_t rcx, uint64_t rdx) 
 #define ESETUSSA 0x102
 #define EMODP 0x103
 #define ECLONE 0x104
+#define ESETTIMER 0x105
 
 #define SGX_LAUNCH_KEY         0
 #define SGX_PROVISION_KEY      1

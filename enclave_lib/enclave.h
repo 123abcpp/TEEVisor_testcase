@@ -144,6 +144,7 @@ struct enclave_build_param
     char *user_path;           // The path of program code binary to run
     char *handler_symbol_name; // Use to locate the symbol and add handler page
     bool edmm_extra_mem;    // Whether to add an extra mem for edmm
+    bool timer;
 };
 
 enum tcs_state

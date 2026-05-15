@@ -1,6 +1,6 @@
 #include "../enclave_lib/enclave_offsets.h"
 #include "../enclave_lib/enclave_runtime.h"
-.extern do_eexit
+.extern do_eexit handle_timer
 
 .macro HANDLER_DEFAULT_ENTRY name
 \name:
@@ -33,7 +33,10 @@ entry_handler_syscall:
     jmp runtime_syscall_handler_entry
     .zero 128 - (. - entry_handler_syscall)
 
-    .rept 20
+entry_handler_timer:
+    jmp runtime_timer_handler_entry
+    .zero 128 - (. - entry_handler_timer)
+    .rept 19
 1:
     jmp runtime_default_exception_handler_entry
     .zero 128 - (. - 1b)
@@ -79,7 +82,16 @@ runtime_syscall_handler_entry:
 1:
 #endif
 
+    /* if the value is 111, timer test exit*/
+    cmpq $111, %rax
+    jne 2f
+    movq $111, %rsi /* set rsi to 111 for later print timer count*/
 
+2:
     movq $EEXIT_OCALL_SYSCALL, %rdi
     call do_ocall
+
+runtime_timer_handler_entry:
+    mov %rax, %rdi
+    call handle_timer
 

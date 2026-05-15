@@ -4,6 +4,7 @@
 #include "../enclave_lib/enclave_runtime.h"
 #include "./mm/mm.h"
 #include "./utils.h"
+extern uint64_t timer_count;
 
 int do_eclone(struct ocall_clone *clone);
 int do_ocall(uint64_t rdi, uint64_t rsi);
@@ -13,6 +14,7 @@ void ocall_clone_thread(struct ocall_clone_thread *clone_thread);
 void ocall_get_test_case(struct ocall_get_test_case *test_case);
 extern void __do_eexit(uint64_t rdi, uint64_t rsi);
 void do_eexit(uint64_t rdi, uint64_t rsi);
+void handle_timer(uint64_t cssa);
 int do_eaccept(uint64_t addr, uint64_t flags);
 int do_emodp(uint64_t addr, uint64_t flags);
 int do_ereport(sgx_target_info_t* target_info, sgx_report_data_t* report_data, sgx_report_t* out_put_report);
@@ -21,6 +23,7 @@ int do_emodpe(uint64_t addr, uint64_t flags);
 int do_esetussa(uint64_t addr);
 int do_eswitch(sgx_switch_flag_t switch_flag);
 int do_eraise(uint32_t exitinfo, uint64_t maddr, uint32_t errcd_value);
+int do_esettimer(uint64_t count, uint64_t periodic);
 
 #ifdef EXCEPTION_LOG
 extern uint64_t eswitch_tsc;
